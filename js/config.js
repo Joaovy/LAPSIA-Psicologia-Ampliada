@@ -106,12 +106,18 @@ const OPCOES_CONFIG = {
 // apoio à decisão humana, nunca um corte automático. Só existe para estas 3 diretorias — a
 // Administrativa e de Pessoas nunca teve esse sinal automático no sistema real, então o selo
 // dela é sempre marcado manualmente (ver campo seloManual mais abaixo).
+// IDs alinhados ao schema (5 diretorias reais): academica | cientifica | eventos-comunicacao |
+// administrativa-pessoas | financeira. Administrativa nunca teve sinalização automática.
 const DIRETORIA_TEMA_MAP = {
-  "academica-cientifica": {
-    tema:"Produção científica, pesquisa e calendário pedagógico",
-    keywords:["científic","pesquisa","artigo","metodologia","ementa","leitura","produção","acadêmic","orientação","congresso"]
+  "academica": {
+    tema:"Qualidade pedagógica e calendário de encontros",
+    keywords:["calendário","pedagogia","ementa","leitura","encontros","pauta","grupo de leitura","pedagóg"]
   },
-  "marketing-eventos": {
+  "cientifica": {
+    tema:"Produção científica e pesquisa",
+    keywords:["científic","pesquisa","artigo","metodologia","produção","acadêmic","orientação","congresso","publicaç"]
+  },
+  "eventos-comunicacao": {
     tema:"Comunicação, identidade visual e eventos",
     keywords:["instagram","comunicaç","evento","palestra","divulgaç","rede social","conteúdo","design","arte","whatsapp"]
   },

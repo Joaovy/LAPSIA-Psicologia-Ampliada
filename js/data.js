@@ -1,22 +1,97 @@
+// Submódulos de navegação por diretoria — UI estática, alinhada aos IDs do schema.
+// Administrativa e de Pessoas concentra todos os módulos operacionais do sistema.
+const _SUBMODULOS = {
+  'administrativa-pessoas': [
+    {id:"selecao-diretores",  nome:"Seleção de Diretores", implementado:true},
+    {id:"selecao-ligantes",   nome:"Seleção de Ligantes",  implementado:true},
+    {id:"presenca",           nome:"Frequência",           implementado:true},
+    {id:"certificados",       nome:"Certificados",         implementado:true},
+    {id:"feedback",           nome:"Feedback",             implementado:true},
+    {id:"agendamento-sala",   nome:"Agendamento de Sala",  implementado:true}
+  ],
+  'academica':         [{id:"cronograma", nome:"Cronograma", implementado:true}],
+  'cientifica':        [],
+  'eventos-comunicacao':[],
+  'financeira':        []
+};
+
 async function fetchDiretorias(){
-  LAPSIA_DB.diretorias.forEach(d => {
-    d.candidatosInscritos = d._candidatosInscritosExemplo.map(c => ({...c, diretoriaId:d.id, diretoriaNome:d.nome, ...getOverlaySeeded(c)}));
-  });
-  return LAPSIA_DB.diretorias;
+  const { data, error } = await sb
+    .from('diretorias')
+    .select('id, nome, objetivo, responsabilidades, entregas, criterios_permanencia')
+    .eq('ativo', true)
+    .order('nome');
+  if(error){
+    console.error('fetchDiretorias:', error);
+    // fallback: mock local (usa _candidatosInscritosExemplo para preservar o estado original entre renders)
+    LAPSIA_DB.diretorias.forEach(d => {
+      const raw = d._candidatosInscritosExemplo || d.candidatosInscritos || [];
+      d.candidatosInscritos = raw.map(c => ({...c, diretoriaId:d.id, diretoriaNome:d.nome, ...getOverlaySeeded(c)}));
+    });
+    return LAPSIA_DB.diretorias;
+  }
+  return (data || []).map(d => ({
+    id:               d.id,
+    nome:             d.nome,
+    objetivo:         d.objetivo || "",
+    responsabilidades:d.responsabilidades || [],
+    entregas:         d.entregas || [],
+    criterios:        d.criterios_permanencia || [],
+    submodulos:       _SUBMODULOS[d.id] || [],
+    candidatosInscritos: [] // diretores vêm de inscricoes WHERE tipo='diretor' (Passo D)
+  }));
 }
 async function fetchDiretoria(id){
   const diretorias = await fetchDiretorias();
   return diretorias.find(d => d.id === id) || null;
 }
-function fetchNucleos(){
-  // TODO(integração): trocar por fetch('.../exec?api=1&fn=getNucleos')
-  return Promise.resolve(LAPSIA_DB.nucleos);
+async function fetchNucleos(){
+  const { data, error } = await sb
+    .from('nucleos')
+    .select('id, nome, descricao, responsabilidades, criterios, carga_horaria, link_agendamento')
+    .eq('tipo', 'nucleo')
+    .eq('ativo', true)
+    .order('nome');
+  if(error){ console.error('fetchNucleos:', error); return LAPSIA_DB.nucleos; }
+  const nucleos = (data || []).map(n => {
+    const local = LAPSIA_DB.nucleos.find(m => m.id === n.id) || {};
+    return {
+      id:               n.id,
+      nome:             n.nome,
+      descricao:        n.descricao || "",
+      responsabilidades:n.responsabilidades || [],
+      criterios:        n.criterios || [],
+      cargaHoraria:     n.carga_horaria || null,
+      linkAgendamento:  n.link_agendamento || null,
+      encontros:        local.encontros || [] // tabela encontros migrada futuramente
+    };
+  });
+  LAPSIA_DB.nucleos = nucleos; // cache para cargaHorariaPorOpcao() e fetchNucleo()
+  return nucleos;
 }
 function fetchNucleo(id){
   return Promise.resolve(LAPSIA_DB.nucleos.find(n => n.id === id) || null);
 }
-function fetchLigaAmpliada(){
-  return Promise.resolve(LAPSIA_DB.ligaAmpliada);
+async function fetchLigaAmpliada(){
+  const { data, error } = await sb
+    .from('nucleos')
+    .select('id, nome, descricao, responsabilidades, criterios, carga_horaria, link_agendamento')
+    .eq('tipo', 'liga_ampliada')
+    .eq('ativo', true)
+    .single();
+  if(error){ console.error('fetchLigaAmpliada:', error); return LAPSIA_DB.ligaAmpliada; }
+  const liga = {
+    id:               data.id,
+    nome:             data.nome,
+    descricao:        data.descricao || "",
+    responsabilidades:data.responsabilidades || [],
+    criterios:        data.criterios || [],
+    cargaHoraria:     data.carga_horaria || null,
+    linkAgendamento:  data.link_agendamento || null,
+    encontros:        LAPSIA_DB.ligaAmpliada.encontros || []
+  };
+  LAPSIA_DB.ligaAmpliada = liga; // cache para cargaHorariaPorOpcao()
+  return liga;
 }
 // Carga horária certificada de cada trilha (núcleo ou Liga Ampliada) — lida direto do cadastro
 // do núcleo/liga (campo cargaHoraria), pra nunca duplicar esse número em outro lugar.
@@ -118,7 +193,8 @@ async function fetchDashboardIndicadores(){
   const certificadosPendentes = elegiveis.filter(c=>c.status==="aguardando").length;
   const certificadosEmitidos = elegiveis.filter(c=>c.status==="emitido").length;
   const candidatosLigantes = LAPSIA_DB.candidatosCuradoria.length;
-  const candidatosDiretores = LAPSIA_DB.diretorias.reduce((s,d)=>s+d._candidatosInscritosExemplo.length,0);
+  // TODO(Passo D): contar de inscricoes WHERE tipo='diretor' AND semestre=SELDIR_SEMESTRE
+  const candidatosDiretores = 0;
   return {
     ligantesAtivos,
     presencaMedia,

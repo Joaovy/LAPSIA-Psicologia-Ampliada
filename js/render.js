@@ -128,7 +128,7 @@ async function renderDashboardPage(){
     <div class="card">
       <div class="card-header-row">
         <h2>Próximos Encontros</h2>
-        <span class="card-link" onclick="navigate({type:'submodulo', diretoriaId:'academica-cientifica', submoduloId:'cronograma'})">Ver cronograma completo</span>
+        <span class="card-link" onclick="navigate({type:'submodulo', diretoriaId:'academica', submoduloId:'cronograma'})">Ver cronograma completo</span>
       </div>
       ${encontrosHtml}
     </div>
@@ -613,9 +613,9 @@ async function renderOrganogramaPage(){
       : `<span class="oc-vaga-inline">Vaga em aberto</span>`;
     const nodeHtml = ocNode("oc-diretoria", escapeHtml(d.nome), subtitle);
 
-    // Só a Diretoria Acadêmica e Científica "governa" os núcleos temáticos na estrutura da liga.
+    // Só a Diretoria Acadêmica "governa" os núcleos temáticos na estrutura da liga.
     let filhosHtml = "";
-    if(d.id === "academica-cientifica"){
+    if(d.id === "academica"){
       const nucleosLis = LAPSIA_DB.nucleos.map(n => {
         const membros = candidatosLigantes
           .filter(c => c.opcao === n.nome && etapaProcessoLigante(c).etapa === "aprovado_final_nucleo")

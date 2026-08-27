@@ -60,8 +60,9 @@ let MSG_CONFIG = {
   // Diretor(a) responsável por cada diretoria (nome + telefone) — usado na mensagem de
   // aprovação de Seleção de Diretores, igual ao coordenador de núcleo faz para Ligantes.
   diretores: {
-    "academica-cientifica":{nome:"", telefone:""},
-    "marketing-eventos":{nome:"", telefone:""},
+    "academica":{nome:"", telefone:""},
+    "cientifica":{nome:"", telefone:""},
+    "eventos-comunicacao":{nome:"", telefone:""},
     "financeira":{nome:"", telefone:""},
     "administrativa-pessoas":{nome:"", telefone:""}
   },
