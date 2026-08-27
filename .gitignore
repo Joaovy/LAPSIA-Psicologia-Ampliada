@@ -1,0 +1,15 @@
+# Credenciais e dados sensíveis
+.env
+.env.local
+*.env
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Arquivos de trabalho antigos (mantidos localmente como referência)
+lapsia_dashboard_15.html
