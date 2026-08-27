@@ -268,7 +268,7 @@ const LAPSIA_DB = {
     // esses dados pra validar a experiência do Ligante ponta a ponta com nome/telefone reais.
     // Pristino de propósito, igual ao lote da Revisão 12, pra ela poder rodar o fluxo inteiro
     // (rubrica → agendamento → entrevista → devolutiva → frequência) a partir do zero.
-    {nome:"Andressa dos Santos Machado", email:"andressa.machado@sankhya.com", telefone:"(34) 9 9276-2325", turno:"Noturno", periodo:"1º", opcao:"Morte e Luto", dataInscricao:"24/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
+    {nome:"Andressa da Silva Rodrigues", email:"andressa.rodrigues@gmail.com", telefone:"(34) 1 1234-2325", turno:"Noturno", periodo:"1º", opcao:"Morte e Luto", dataInscricao:"24/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Dado de teste real (adicionado a pedido dela em 24/08/2026, para validar a experiência do Ligante).",
      etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}}
   ],
