@@ -21,8 +21,9 @@ async function fetchDiretorias(){
     .select('id, nome, objetivo, responsabilidades, entregas, criterios_permanencia')
     .eq('ativo', true)
     .order('nome');
-  if(error){
-    console.error('fetchDiretorias:', error);
+  if(error || !data || data.length === 0){
+    if(error) console.error('fetchDiretorias:', error);
+    else console.warn('fetchDiretorias: Supabase retornou vazio — verifique RLS da tabela diretorias');
     // fallback: mock local (usa _candidatosInscritosExemplo para preservar o estado original entre renders)
     LAPSIA_DB.diretorias.forEach(d => {
       const raw = d._candidatosInscritosExemplo || d.candidatosInscritos || [];
@@ -30,7 +31,7 @@ async function fetchDiretorias(){
     });
     return LAPSIA_DB.diretorias;
   }
-  return (data || []).map(d => ({
+  const diretorias = data.map(d => ({
     id:               d.id,
     nome:             d.nome,
     objetivo:         d.objetivo || "",
@@ -40,6 +41,8 @@ async function fetchDiretorias(){
     submodulos:       _SUBMODULOS[d.id] || [],
     candidatosInscritos: [] // diretores vêm de inscricoes WHERE tipo='diretor' (Passo D)
   }));
+  LAPSIA_DB.diretorias = diretorias; // cache para renderSidebar() e allCandidatosDiretores()
+  return diretorias;
 }
 async function fetchDiretoria(id){
   const diretorias = await fetchDiretorias();
@@ -52,8 +55,12 @@ async function fetchNucleos(){
     .eq('tipo', 'nucleo')
     .eq('ativo', true)
     .order('nome');
-  if(error){ console.error('fetchNucleos:', error); return LAPSIA_DB.nucleos; }
-  const nucleos = (data || []).map(n => {
+  if(error || !data || data.length === 0){
+    if(error) console.error('fetchNucleos:', error);
+    else console.warn('fetchNucleos: Supabase retornou vazio — verifique RLS da tabela nucleos');
+    return LAPSIA_DB.nucleos;
+  }
+  const nucleos = data.map(n => {
     const local = LAPSIA_DB.nucleos.find(m => m.id === n.id) || {};
     return {
       id:               n.id,

@@ -61,11 +61,14 @@ async function renderMain(){
     main.innerHTML = await renderOrganogramaPage();
   } else if(p.type === "diretoria"){
     const d = await fetchDiretoria(p.id);
+    if(!d){ main.innerHTML = `<div class="empty-state">Diretoria não encontrada.</div>`; return; }
     crumb.textContent = "Diretoria " + d.nome;
     main.innerHTML = renderDiretoriaPage(d);
   } else if(p.type === "submodulo"){
     const d = await fetchDiretoria(p.diretoriaId);
+    if(!d){ main.innerHTML = `<div class="empty-state">Diretoria não encontrada.</div>`; return; }
     const sm = d.submodulos.find(s => s.id === p.submoduloId);
+    if(!sm){ main.innerHTML = `<div class="empty-state">Módulo não encontrado.</div>`; return; }
     crumb.textContent = d.nome + " · " + sm.nome;
     main.innerHTML = await renderSubmodulePage(d, sm);
   } else if(p.type === "nucleo"){
