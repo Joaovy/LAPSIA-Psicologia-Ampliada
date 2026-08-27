@@ -242,35 +242,35 @@ const LAPSIA_DB = {
   candidatosCuradoria: [
     {nome:"Sofia Almeida Rocha", email:"sofia.rocha@unitri.edu.br", telefone:"(34) 9 9112-5563", turno:"Matutino", periodo:"1º", opcao:"Liga Ampliada", dataInscricao:"20/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Quero participar da liga para ter uma formação mais ampla desde o início da graduação.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Alex Souza Martins", email:"alex.martins@unitri.edu.br", telefone:"(34) 9 9223-6674", turno:"Noturno", periodo:"2º", opcao:"Liga Ampliada", dataInscricao:"21/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Busco vivências de ciência, ética e escuta que complementem minha formação em Psicologia.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Rodrigo Teixeira Nunes", email:"rodrigo.nunes@unitri.edu.br", telefone:"(34) 9 9334-7785", turno:"Noturno", periodo:"4º", opcao:"Logoterapia", dataInscricao:"19/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Me interesso por Viktor Frankl e pela busca de sentido, quero estudar isso com mais profundidade.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Manuela Prado Siqueira", email:"manuela.siqueira@unitri.edu.br", telefone:"(34) 9 9445-8896", turno:"Matutino", periodo:"3º", opcao:"Logoterapia", dataInscricao:"22/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Quero aprofundar meus estudos em logoterapia e análise existencial, área que pretendo seguir na pós-graduação.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Bruno Cavalcanti Reis", email:"bruno.reis@unitri.edu.br", telefone:"(34) 9 9556-9907", turno:"Noturno", periodo:"5º", opcao:"Morte e Luto", dataInscricao:"18/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Tenho interesse em cuidados paliativos e quero entender melhor o papel do psicólogo diante da finitude.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Valentina Moraes Freitas", email:"valentina.freitas@unitri.edu.br", telefone:"(34) 9 9667-1018", turno:"Matutino", periodo:"2º", opcao:"Morte e Luto", dataInscricao:"21/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Quero estudar os processos de luto e terminalidade com mais profundidade, é um tema que me toca bastante.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Felipe Andrade Barros", email:"felipe.barros@unitri.edu.br", telefone:"(34) 9 9778-2129", turno:"Matutino", periodo:"6º", opcao:"Psicologia Escolar", dataInscricao:"20/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Tenho interesse em psicologia escolar e quero levar projetos práticos pras escolas da região.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     {nome:"Letícia Nogueira Campos", email:"leticia.campos@unitri.edu.br", telefone:"(34) 9 9889-3230", turno:"Noturno", periodo:"1º", opcao:"Psicologia Escolar", dataInscricao:"22/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Quero entender melhor o desenvolvimento e a aprendizagem das crianças no ambiente escolar.",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}},
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}},
     // Dado de teste REAL (não fictício) — ela pediu explicitamente (24/08/2026) pra subir com
     // esses dados pra validar a experiência do Ligante ponta a ponta com nome/telefone reais.
     // Pristino de propósito, igual ao lote da Revisão 12, pra ela poder rodar o fluxo inteiro
     // (rubrica → agendamento → entrevista → devolutiva → frequência) a partir do zero.
     {nome:"Andressa da Silva Rodrigues", email:"andressa.rodrigues@gmail.com", telefone:"(34) 1 1234-2325", turno:"Noturno", periodo:"1º", opcao:"Morte e Luto", dataInscricao:"24/08/2026", entrevista:null, resultadoEntrevista:null, observacoes:"",
      motivacaoTexto:"Dado de teste real (adicionado a pedido dela em 24/08/2026, para validar a experiência do Ligante).",
-     etica:"", notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null}}
+     etica:"", notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null}}
   ],
 
   // Zerado de propósito nesta rodada (23/08/2026): como o gatilho automático da Revisão 9

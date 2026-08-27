@@ -19,7 +19,7 @@ function getOverlay(email){
   if(!CURADORIA_OVERLAY[email]){
     CURADORIA_OVERLAY[email] = {
       entrevista:null, resultadoEntrevista:null, observacoes:"", etica:"",
-      notas:{motivacao:null, interesse:null, comprometimento:null, contribuicao:null},
+      notas:{motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null},
       notificado:{agendamento:false, devolutiva:false} // só controle manual dela ("já enviei essa mensagem"), não envia nada de verdade
     };
   }
@@ -36,7 +36,7 @@ function getOverlaySeeded(c){
       resultadoEntrevista: c.resultadoEntrevista||null,
       observacoes: c.observacoes||"",
       etica: c.etica||"",
-      notas: c.notas ? {...c.notas} : {motivacao:null, interesse:null, comprometimento:null, contribuicao:null},
+      notas: c.notas ? {...c.notas} : {motivacao:null, comprometimento:null, postura_etica:null, comunicacao_escuta:null},
       notificado:{agendamento:false, devolutiva:false}
     };
   }

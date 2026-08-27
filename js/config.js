@@ -61,13 +61,15 @@ const ICON = {
    dashboard atual (Google Sheets/Apps Script). Ajuste os valores conforme a fonte
    real for conectada. */
 
-const RUBRICA_CRITERIOS = ["motivacao","interesse","comprometimento","contribuicao"];
+// Critérios alinhados ao Plano Estratégico seção 8.3 e às colunas da tabela `rubricas` no Supabase:
+// nota_motivacao_alinhamento | nota_comprometimento | nota_postura_etica | nota_comunicacao_escuta
+const RUBRICA_CRITERIOS = ["motivacao","comprometimento","postura_etica","comunicacao_escuta"];
 
 const RUBRICA_LABELS = {
-  motivacao: "Motivação e alinhamento",
-  interesse: "Interesse de aprendizagem",
-  comprometimento: "Comprometimento",
-  contribuicao: "Contribuição e postura"
+  motivacao:          "Motivação e alinhamento",
+  comprometimento:    "Comprometimento",
+  postura_etica:      "Postura ética",
+  comunicacao_escuta: "Comunicação e escuta"
 };
 
 // Textos de faixa da rubrica — diferentes para Liga Ampliada x Núcleos, conforme
@@ -77,17 +79,17 @@ const RUBRICA_TEXTOS = {
     nucleo:{insuf:"Motivação genérica, sem conexão com o tema específico do núcleo.", parcial:"Motivação com o núcleo mencionada mas pouco articulada.", consist:"Motivação claramente conectada ao tema e aos objetivos do núcleo."},
     liga:{insuf:"Motivação genérica, sem conexão com o propósito da Liga Ampliada.", parcial:"Motivação com a Liga mencionada, mas pouco articulada.", consist:"Motivação claramente conectada ao propósito e à identidade da Liga."}
   },
-  interesse: {
-    nucleo:{insuf:"Sem interesse específico no tema do núcleo.", parcial:"Interesse mencionado, mas superficial ou genérico.", consist:"Interesse claro pelo tema, com disposição para aprofundar teoria e prática."},
-    liga:{insuf:"Sem interesse específico em formação acadêmica ampliada.", parcial:"Interesse mencionado, mas superficial ou genérico.", consist:"Interesse claro por ciência, ética e escuta como eixos de formação."}
-  },
   comprometimento: {
     nucleo:{insuf:"Incerteza sobre disponibilidade de horário ou resistência a cumprir entregas.", parcial:"Disponibilidade mencionada, mas sem clareza sobre entregas e frequência.", consist:"Disponibilidade confirmada, aceita as regras de frequência e entregas do núcleo."},
     liga:{insuf:"Incerteza sobre disponibilidade ou resistência ao compromisso com a Liga.", parcial:"Disponibilidade mencionada, mas sem clareza sobre entregas.", consist:"Disponibilidade confirmada, aceita as regras e o compromisso com a Liga."}
   },
-  contribuicao: {
+  postura_etica: {
     nucleo:{insuf:"Postura pouco reflexiva ou falas que denotam preconceito e pouca escuta.", parcial:"Postura adequada, mas pouco articulada sobre ética e diversidade.", consist:"Postura ética e reflexiva, reconhece limites e valoriza a escuta e a diversidade."},
     liga:{insuf:"Postura pouco reflexiva ou falas que denotam preconceito e pouca escuta.", parcial:"Postura adequada, mas pouco articulada sobre ética e diversidade.", consist:"Postura ética e reflexiva, reconhece limites e valoriza a escuta e a diversidade."}
+  },
+  comunicacao_escuta: {
+    nucleo:{insuf:"Dificuldade em comunicar ideias com clareza; pouca escuta ou interrupções frequentes.", parcial:"Comunicação adequada, mas escuta pouco desenvolvida ou respostas pouco articuladas.", consist:"Comunica-se com clareza, demonstra escuta ativa e sabe formular perguntas pertinentes."},
+    liga:{insuf:"Dificuldade em comunicar ideias com clareza; pouca escuta ou interrupções frequentes.", parcial:"Comunicação adequada, mas escuta pouco desenvolvida ou respostas pouco articuladas.", consist:"Comunica-se com clareza, demonstra escuta ativa e sabe formular perguntas pertinentes."}
   }
 };
 
