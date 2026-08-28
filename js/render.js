@@ -88,6 +88,11 @@ async function renderMain(){
 function demoBadge(){
   return `<span class="badge badge-demo">Dados de exemplo</span>`;
 }
+function formatarCPF(cpf){
+  const d = String(cpf||"").replace(/\D/g,"");
+  if(d.length !== 11) return String(cpf||"");
+  return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
 
 /* ---------- DASHBOARD ---------- */
 async function renderDashboardPage(){
@@ -1374,7 +1379,7 @@ async function renderCertificadosPage(){
         </table>
       </div>
     </div>
-    <div class="modal-footer-note" style="margin-top:10px;">Clique no nome de alguém para abrir a mensagem de "certificado disponível" (e-mail/WhatsApp). O botão "Gerar certificado" já baixa o arquivo .pptx editável, preenchido com nome e carga horária (o modelo que você mandou não tem campo de CPF — avise se quiser incluir um).</div>`;
+    <div class="modal-footer-note" style="margin-top:10px;">Clique no nome de alguém para abrir a mensagem de "certificado disponível" (e-mail/WhatsApp). O botão "Gerar certificado" baixa o arquivo .pptx editável com nome, carga horária e CPF (quando cadastrado).</div>`;
 }
 function certificadosFiltrados(certs){
   return certs.filter(c=>{
@@ -1477,17 +1482,27 @@ function adicionarSlideCertificado(pptx, c, dataEmissao){
   });
   slide.addShape("rect", {x:CERT_SLIDE_W/2-2.6, y:3.86, w:5.2, h:0.015, fill:{color:t.corNavyClara}, line:{type:"none"}});
 
+  // CPF — ocupa a lacuna entre o traço do nome e o corpo do texto; shift de 0.3" quando presente
+  const temCPF = !!c.cpf;
+  const cpfShift = temCPF ? 0.3 : 0;
+  if(temCPF){
+    slide.addText(`CPF: ${formatarCPF(c.cpf)}`, {
+      x:0, y:3.90, w:CERT_SLIDE_W, h:0.24, align:"center",
+      fontFace:"Calibri", fontSize:11, color:t.corNavyClara, italic:true
+    });
+  }
+
   const horas = c.cargaHoraria != null ? c.cargaHoraria : "[X]";
   slide.addText(
     `concluiu com êxito as atividades referentes ao segundo semestre da Liga Acadêmica, cumprindo a carga `+
     `horária de ${horas} horas, demonstrando dedicação, compromisso acadêmico e participação ativa nas `+
     `atividades desenvolvidas.`,
-    { x:1.15, y:4.08, w:CERT_SLIDE_W-2.3, h:1.15, align:"center", fontFace:"Calibri", fontSize:14.5, color:t.corTextoCorpo, lineSpacingMultiple:1.25 }
+    { x:1.15, y:4.08+cpfShift, w:CERT_SLIDE_W-2.3, h:1.15, align:"center", fontFace:"Calibri", fontSize:14.5, color:t.corTextoCorpo, lineSpacingMultiple:1.25 }
   );
 
   slide.addText(
     `Período: ${t.periodoInicio} a ${t.periodoFim} · Uberlândia, ${formatarDataExtensoPtBr(dataEmissao)}`,
-    { x:0, y:5.4, w:CERT_SLIDE_W, h:0.35, align:"center", italic:true, fontFace:"Calibri", fontSize:12, color:t.corNavyClara }
+    { x:0, y:5.4+cpfShift, w:CERT_SLIDE_W, h:0.35, align:"center", italic:true, fontFace:"Calibri", fontSize:12, color:t.corNavyClara }
   );
 
   // Assinaturas — presidente (esquerda) e coordenadora do curso (direita), fixas por semestre.
@@ -1535,7 +1550,7 @@ async function handleGerarCertificado(chave){
   await pptx.writeFile({ fileName: nomeArquivoCertificado(c.ligante) });
   c.status = "emitido";
   c.data = new Intl.DateTimeFormat('pt-BR').format(agora);
-  showToast(`Certificado de ${c.ligante} baixado (.pptx editável) — falta só revisar e, se quiser, incluir o CPF antes de enviar.`);
+  showToast(`Certificado de ${c.ligante} baixado (.pptx editável)${c.cpf ? " — CPF incluído" : " — CPF não cadastrado, preencha se necessário"}.`);
   const tCert = document.getElementById("cert-tbody");
   if(tCert) fetchCertificadosElegiveis().then(cs => { tCert.innerHTML = renderCertRows(cs); });
 }

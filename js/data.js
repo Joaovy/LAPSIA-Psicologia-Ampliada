@@ -1,3 +1,6 @@
+// Cache de inscricao_id por email — populado por fetchCuradoria(), usado pelos helpers de save.
+const _INSCRICAO_IDS = {};
+
 // Submódulos de navegação por diretoria — UI estática, alinhada aos IDs do schema.
 // Administrativa e de Pessoas concentra todos os módulos operacionais do sistema.
 const _SUBMODULOS = {
@@ -107,13 +110,61 @@ function cargaHorariaPorOpcao(opcao){
   const n = LAPSIA_DB.nucleos.find(x => x.nome === opcao);
   return n ? n.cargaHoraria : null;
 }
+async function _getUserId(){
+  const { data: { session } } = await sb.auth.getSession();
+  return session?.user?.id || null;
+}
+function calcularResultadoRubrica(ov){
+  const { motivacao, comprometimento, postura_etica, comunicacao_escuta } = ov.notas;
+  if([motivacao, comprometimento, postura_etica, comunicacao_escuta].some(n => n === null)) return null;
+  if(ov.etica === "sim") return "reprovado";
+  const total = (motivacao||0)+(comprometimento||0)+(postura_etica||0)+(comunicacao_escuta||0);
+  return total >= 12 ? "aprovado" : "reprovado";
+}
+async function upsertRubrica(inscricao_id, email){
+  const ov = getOverlay(email);
+  const uid = await _getUserId();
+  const { error } = await sb.from('rubricas').upsert({
+    inscricao_id,
+    avaliador_id:              uid,
+    nota_motivacao_alinhamento:ov.notas.motivacao,
+    nota_comprometimento:      ov.notas.comprometimento,
+    nota_postura_etica:        ov.notas.postura_etica,
+    nota_comunicacao_escuta:   ov.notas.comunicacao_escuta,
+    etica_eliminatorio:        ov.etica === "sim",
+    observacoes:               ov.observacoes || null,
+    resultado:                 calcularResultadoRubrica(ov),
+    avaliado_em:               new Date().toISOString()
+  }, { onConflict: 'inscricao_id' });
+  if(error) console.error('upsertRubrica:', error);
+}
+async function upsertEntrevista(inscricao_id, email){
+  const ov = getOverlay(email);
+  const uid = await _getUserId();
+  const { error } = await sb.from('entrevistas').upsert({
+    inscricao_id,
+    avaliador_id: uid,
+    agendada_para: ov.entrevista || null,
+    resultado:     ov.resultadoEntrevista || "pendente"
+  }, { onConflict: 'inscricao_id' });
+  if(error) console.error('upsertEntrevista:', error);
+}
+async function inserirNotificacao(inscricao_id, etapa){
+  const uid = await _getUserId();
+  const { error } = await sb.from('notificacoes_enviadas')
+    .insert({ inscricao_id, etapa, enviado_via:'whatsapp', enviado_por: uid });
+  if(error) console.error('inserirNotificacao:', error);
+}
+
 async function fetchCuradoria(){
   const { data, error } = await sb
     .from('inscricoes')
     .select(`
       id, motivacao, data_inscricao, nucleo_id,
-      pessoas (nome, email, telefone, turno, periodo),
-      nucleos (nome)
+      pessoas (nome, email, telefone, turno, periodo, cpf),
+      nucleos (nome),
+      rubricas (nota_motivacao_alinhamento, nota_comprometimento, nota_postura_etica, nota_comunicacao_escuta, etica_eliminatorio, observacoes, resultado),
+      entrevistas (agendada_para, resultado)
     `)
     .eq('semestre', SELLIG_SEMESTRE)
     .in('tipo', ['ligante_nucleo', 'ligante_liga_ampliada'])
@@ -124,17 +175,37 @@ async function fetchCuradoria(){
   const candidatos = (data || []).map(insc => {
     const c = {
       id:             insc.id,
-      nome:           insc.pessoas?.nome  || "",
-      email:          insc.pessoas?.email || "",
+      nome:           insc.pessoas?.nome     || "",
+      email:          insc.pessoas?.email    || "",
       telefone:       insc.pessoas?.telefone || "",
       turno:          insc.pessoas?.turno    || "",
       periodo:        insc.pessoas?.periodo  || "",
+      cpf:            insc.pessoas?.cpf      || null,
       opcao:          insc.nucleos?.nome     || "",
       dataInscricao:  insc.data_inscricao
                         ? new Date(insc.data_inscricao + 'T00:00:00').toLocaleDateString('pt-BR')
                         : "",
       motivacaoTexto: insc.motivacao || "",
     };
+    _INSCRICAO_IDS[c.email] = insc.id;
+    // Pré-popula overlay com dados do banco (só na primeira vez desta sessão)
+    if(!CURADORIA_OVERLAY[c.email]){
+      const rubrica    = insc.rubricas?.[0];
+      const entrevista = insc.entrevistas?.[0];
+      CURADORIA_OVERLAY[c.email] = {
+        entrevista:          entrevista?.agendada_para || null,
+        resultadoEntrevista: (entrevista?.resultado && entrevista.resultado !== 'pendente') ? entrevista.resultado : null,
+        observacoes:         rubrica?.observacoes || "",
+        etica:               rubrica?.etica_eliminatorio ? "sim" : "",
+        notas: {
+          motivacao:          rubrica?.nota_motivacao_alinhamento ?? null,
+          comprometimento:    rubrica?.nota_comprometimento       ?? null,
+          postura_etica:      rubrica?.nota_postura_etica         ?? null,
+          comunicacao_escuta: rubrica?.nota_comunicacao_escuta    ?? null,
+        },
+        notificado: { agendamento:false, devolutiva:false }
+      };
+    }
     return { ...c, ...getOverlay(c.email) };
   });
   candidatos.forEach(garantirAcompanhamentoFrequencia);
@@ -152,6 +223,7 @@ function garantirAcompanhamentoFrequencia(c){
   LAPSIA_DB.certificados.push({
     ligante: c.nome,
     email: c.email,
+    cpf: c.cpf || null,
     telefone: c.telefone,
     nucleo: c.opcao,
     turno: c.turno,
@@ -166,10 +238,12 @@ function garantirAcompanhamentoFrequencia(c){
 }
 function salvarNotaCuradoria(email, criterio, valor){
   getOverlay(email).notas[criterio] = valor;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertRubrica(id, email);
   return Promise.resolve({ok:true});
 }
 function salvarEticaCuradoria(email, valor){
   getOverlay(email).etica = valor;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertRubrica(id, email);
   return Promise.resolve({ok:true});
 }
 function fetchCertificados(){
@@ -218,14 +292,17 @@ function fetchCronogramaEncontros(){
 }
 function agendarEntrevistaDiretoria(diretoriaId, email, valor){
   getOverlay(email).entrevista = valor || null;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertEntrevista(id, email);
   return Promise.resolve({ok:true});
 }
 function agendarEntrevistaLigante(email, valor){
   getOverlay(email).entrevista = valor || null;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertEntrevista(id, email);
   return Promise.resolve({ok:true});
 }
 function salvarObservacoesCuradoria(email, texto){
   getOverlay(email).observacoes = texto;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertRubrica(id, email);
   return Promise.resolve({ok:true});
 }
 function handleCalendarUpload(key, inputEl){
@@ -237,10 +314,12 @@ function handleCalendarUpload(key, inputEl){
 }
 function salvarResultadoEntrevistaDiretoria(diretoriaId, email, valor){
   getOverlay(email).resultadoEntrevista = valor || null;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertEntrevista(id, email);
   return Promise.resolve({ok:true});
 }
 function salvarResultadoEntrevistaLigante(email, valor){
   getOverlay(email).resultadoEntrevista = valor || null;
+  const id = _INSCRICAO_IDS[email]; if(id) upsertEntrevista(id, email);
   return Promise.resolve({ok:true});
 }
 function fetchFeedback(){

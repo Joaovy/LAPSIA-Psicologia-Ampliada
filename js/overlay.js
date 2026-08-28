@@ -44,6 +44,7 @@ function getOverlaySeeded(c){
 }
 function marcarMensagemEnviada(email, etapa, valor){
   getOverlay(email).notificado[etapa] = !!valor;
+  if(valor){ const id = _INSCRICAO_IDS[email]; if(id) inserirNotificacao(id, etapa); }
   return Promise.resolve({ok:true});
 }
 
